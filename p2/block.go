@@ -40,9 +40,7 @@ func (block *Block) Initial(height int32, parentHash string, value p1.MerklePatr
 	block.Header.Hash = block.HashBlock()
 }
 
-func DecodeFromJson(jsonString string) Block {
-
-
+func DecodeBlockFromJson(json string) Block {
 	return Block{}
 }
 
@@ -50,5 +48,3 @@ func (block *Block) EncodeToJson() string {
 
 	return ""
 }
-
-

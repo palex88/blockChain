@@ -13,10 +13,12 @@ func (chain *BlockChain) Insert()  {
 	
 }
 
-func (chain *BlockChain) EncodeToJson()  {
-	
+func (chain *BlockChain) EncodeToJson() (json string, err error) {
+
+	return "", nil
 }
 
-func (chain *BlockChain) DecodeFromJson() {
+func DecodeChainFromJson(json string) (bc BlockChain, err error) {
 
+	return BlockChain{}, nil
 }
