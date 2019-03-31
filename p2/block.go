@@ -3,7 +3,6 @@ package p2
 import (
 	"encoding/hex"
 	json2 "encoding/json"
-	"fmt"
 	"github.com/palex88/Merkle-Patricia-Trie/p1"
 	"golang.org/x/crypto/sha3"
 	"time"
@@ -19,16 +18,16 @@ type Header struct {
 
 type Block struct {
 	Header Header
-	Value p1.MerklePatriciaTrie
+	Value  p1.MerklePatriciaTrie
 }
 
 type Data struct {
-	Hash string `json:"hash"`
-	TimeStamp int64 `json:"timeStamp"`
-	Height int32 `json:"height"`
-	ParentHash string `json:"parentHash"`
-	Size int32 `json:"size"`
-	Mpt map[string]string `json:"mpt"`
+	Height     int32             `json:"height"`
+	TimeStamp  int64             `json:"timeStamp"`
+	Hash       string            `json:"hash"`
+	ParentHash string            `json:"parentHash"`
+	Size       int32             `json:"size"`
+	Mpt        map[string]string `json:"mpt"`
 }
 
 func (block *Block) HashBlock() string {
@@ -41,7 +40,7 @@ func (block *Block) HashBlock() string {
 	return hash
 }
 
-func (block *Block) Initial(height int32, parentHash string, value p1.MerklePatriciaTrie)  {
+func (block *Block) Initial(height int32, parentHash string, value p1.MerklePatriciaTrie) {
 
 	block.Header.Height = height
 	block.Header.ParentHash = parentHash
@@ -58,19 +57,23 @@ func DecodeBlockFromJson(jsonBlock string) Block {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(data)
+
 	for _, value := range data {
-		fmt.Println(value.Hash)
-		fmt.Println(value.Height)
-		fmt.Println(value.Mpt)
-		fmt.Println(value.ParentHash)
-		fmt.Println(value.Size)
-		fmt.Println(value.TimeStamp)
+		block := Block{}
+		block.Header.Height = value.Height
+		block.Header.Time = value.TimeStamp
+		block.Header.Hash = value.Hash
+		block.Header.ParentHash = value.ParentHash
+		block.Header.Size = value.Size
 	}
 	return Block{}
 }
 
 func (block *Block) EncodeToJson() string {
+	json, err := json2.Marshal(&block)
+	if err != nil {
+		panic(err)
+	}
 
-	return ""
+	return string(json)
 }
