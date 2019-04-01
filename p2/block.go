@@ -3,6 +3,7 @@ package p2
 import (
 	"encoding/hex"
 	json2 "encoding/json"
+	"fmt"
 	"github.com/palex88/Merkle-Patricia-Trie/p1"
 	"golang.org/x/crypto/sha3"
 	"time"
@@ -32,7 +33,6 @@ type Data struct {
 
 func (block *Block) HashBlock() string {
 
-	// TODO: Update mpt to have capitalized parameters
 	hashStr := string(block.Header.Height) + string(block.Header.Time) + block.Header.ParentHash + block.Value.Root + string(block.Header.Size)
 	bytes := sha3.Sum256([]byte(hashStr))
 	hash := hex.EncodeToString(bytes[:])
@@ -46,27 +46,26 @@ func (block *Block) Initial(height int32, parentHash string, value p1.MerklePatr
 	block.Header.ParentHash = parentHash
 	block.Value = value
 	block.Header.Time = time.Now().Unix()
-	block.Header.Size = 0 // TODO: Needs to be updated to the proper value. Maybe check chain for last block height
 	block.Header.Hash = block.HashBlock()
+	block.Header.Size = int32(len([]byte(fmt.Sprintf("%v", block.Value))))
 }
 
 func DecodeBlockFromJson(jsonBlock string) Block {
 
-	data := make([]Data, 0)
+	data := Data{}
 	err := json2.Unmarshal([]byte(jsonBlock), &data)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, value := range data {
-		block := Block{}
-		block.Header.Height = value.Height
-		block.Header.Time = value.TimeStamp
-		block.Header.Hash = value.Hash
-		block.Header.ParentHash = value.ParentHash
-		block.Header.Size = value.Size
-	}
-	return Block{}
+	block := Block{}
+	block.Header.Height = data.Height
+	block.Header.Time = data.TimeStamp
+	block.Header.Hash = data.Hash
+	block.Header.ParentHash = data.ParentHash
+	block.Header.Size = data.Size
+
+	return block
 }
 
 func (block *Block) EncodeToJson() string {
