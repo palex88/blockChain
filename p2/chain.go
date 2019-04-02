@@ -3,6 +3,7 @@ package p2
 import (
 	json2 "encoding/json"
 	"errors"
+	"fmt"
 )
 
 type BlockChain struct {
@@ -40,19 +41,22 @@ func (bc *BlockChain) EncodeToJson() (json string, err error) {
 
 func DecodeChainFromJson(jsonChain string) (bc BlockChain, err error) {
 
-	data := make([]Data, 0)
+	data := make([]BlockChain, 0)
 	err = json2.Unmarshal([]byte(jsonChain), &data)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, value := range data {
-		block := Block{}
-		block.Header.Height = value.Height
-		block.Header.Time = value.TimeStamp
-		block.Header.Hash = value.Hash
-		block.Header.ParentHash = value.ParentHash
-		block.Header.Size = value.Size
+	for i, value := range data {
+		fmt.Printf("i: %d\n", i)
+		fmt.Printf("value: %v\n", value)
+		//block := Block{}
+		//block.Header.Height = value.Header.Height
+		//block.Header.Time = value.Header.Time
+		//block.Header.Hash = value.Header.Hash
+		//block.Header.ParentHash = value.Header.ParentHash
+		//block.Header.Size = value.Header.Size
+		//fmt.Println(block)
 	}
 
 	return BlockChain{}, nil
