@@ -12,6 +12,7 @@ func main() {
 	fmt.Println(block)
 	fmt.Printf("Block: %+v\n", block)
 	json := block.EncodeToJson()
+	fmt.Println(jsonBlock)
 	fmt.Println(json)
 
 	fmt.Println()

@@ -71,7 +71,16 @@ func DecodeBlockFromJson(jsonBlock string) Block {
 }
 
 func (block *Block) EncodeToJson() string {
-	json, err := json2.Marshal(&block)
+
+	data := Data{}
+	data.Height = block.Header.Height
+	data.Hash = block.Header.Hash
+	data.Size = block.Header.Size
+	data.ParentHash = block.Header.ParentHash
+	data.TimeStamp = block.Header.Time
+	data.Mpt = block.Value.KVPairs
+
+	json, err := json2.Marshal(&data)
 	if err != nil {
 		panic(err)
 	}
