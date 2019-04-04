@@ -9,14 +9,6 @@ import (
 	"time"
 )
 
-//type Header struct {
-//	Height     int32  `json:"height"`
-//	Time       int64  `json:"timeStamp"`
-//	Hash       string `json:"hash"`
-//	ParentHash string `json:"parentHash"'`
-//	Size       int32  `json:"size"`
-//}
-
 type Block struct {
 	Value  p1.MerklePatriciaTrie `json:"mpt"`
 	Header struct {
@@ -72,22 +64,8 @@ func DecodeBlockFromJson(jsonBlock string) Block {
 	block.Header.Size = data.Size
 	block.Value.Initial()
 	for key, value := range data.Mpt {
-		//fmt.Println(key)
-		//fmt.Println(value)
-		//fmt.Println(data.Mpt[value])
 		block.Value.Insert(key, value)
 	}
-
-	//fmt.Printf("Data: %+v\n", data)
-	//fmt.Printf("Block: %+v\n", block)
-	//fmt.Println()
-	//fmt.Println(block.Value.Root)
-	//fmt.Println()
-	//block.Value.Order_nodes()
-	//fmt.Println(block.Value.DB)
-	//fmt.Println()
-	//fmt.Println(block.Value.KVPairs)
-	//fmt.Println()
 
 	return block
 }

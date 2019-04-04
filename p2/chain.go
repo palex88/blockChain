@@ -3,7 +3,6 @@ package p2
 import (
 	json2 "encoding/json"
 	"errors"
-	"fmt"
 )
 
 type BlockChain struct {
@@ -23,6 +22,11 @@ func (bc *BlockChain) Get(height int32) (block []Block, err error) {
 func (bc *BlockChain) Insert(block Block) {
 
 	height := block.Header.Height
+
+	if bc.Chain == nil {
+		bc.Chain = make(map[int32][]Block)
+	}
+
 	blockArray := bc.Chain[height]
 	hash := block.Header.Hash
 	for _, value := range blockArray {
@@ -32,6 +36,10 @@ func (bc *BlockChain) Insert(block Block) {
 	}
 
 	blockArray = append(blockArray, block)
+	bc.Chain[height] = blockArray
+	if bc.Length < height {
+		bc.Length = height
+	}
 }
 
 func (bc *BlockChain) EncodeToJson() (json string, err error) {
@@ -39,25 +47,29 @@ func (bc *BlockChain) EncodeToJson() (json string, err error) {
 	return "", nil
 }
 
-func DecodeChainFromJson(jsonChain string) (bc BlockChain, err error) {
+func DecodeChainFromJson(jsonChain string) BlockChain {
 
-	data := make([]BlockChain, 0)
-	err = json2.Unmarshal([]byte(jsonChain), &data)
+	bc := BlockChain{}
+
+	value := make([]Data, 0)
+	err := json2.Unmarshal([]byte(jsonChain), &value)
 	if err != nil {
 		panic(err)
 	}
 
-	for i, value := range data {
-		fmt.Printf("i: %d\n", i)
-		fmt.Printf("value: %v\n", value)
-		//block := Block{}
-		//block.Header.Height = value.Header.Height
-		//block.Header.Time = value.Header.Time
-		//block.Header.Hash = value.Header.Hash
-		//block.Header.ParentHash = value.Header.ParentHash
-		//block.Header.Size = value.Header.Size
-		//fmt.Println(block)
+	for _, data := range value {
+		block := Block{}
+		block.Header.Height = data.Height
+		block.Header.Time = data.TimeStamp
+		block.Header.Hash = data.Hash
+		block.Header.ParentHash = data.ParentHash
+		block.Header.Size = data.Size
+		block.Value.Initial()
+		for key, value := range data.Mpt {
+			block.Value.Insert(key, value)
+		}
+		bc.Insert(block)
 	}
 
-	return BlockChain{}, nil
+	return bc
 }
