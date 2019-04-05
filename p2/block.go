@@ -5,25 +5,26 @@ import (
 	json2 "encoding/json"
 	"fmt"
 	"github.com/palex88/Merkle-Patricia-Trie/p1"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/sha3"
 	"time"
 )
 
 type Block struct {
-	Value  p1.MerklePatriciaTrie `json:"mpt"`
 	Header struct {
-		Height     int32  `json:"height"`
-		Time       int64  `json:"timeStamp"`
 		Hash       string `json:"hash"`
+		Time       int64  `json:"timeStamp"`
+		Height     int32  `json:"height"`
 		ParentHash string `json:"parentHash"'`
 		Size       int32  `json:"size"`
 	}
+	Value  p1.MerklePatriciaTrie `json:"mpt"`
 }
 
 type Data struct {
-	Height     int32             `json:"height"`
-	TimeStamp  int64             `json:"timeStamp"`
 	Hash       string            `json:"hash"`
+	TimeStamp  int64             `json:"timeStamp"`
+	Height     int32             `json:"height"`
 	ParentHash string            `json:"parentHash"`
 	Size       int32             `json:"size"`
 	Mpt        map[string]string `json:"mpt"`
@@ -48,15 +49,15 @@ func (block *Block) Initial(height int32, parentHash string, value p1.MerklePatr
 	block.Header.Size = int32(len([]byte(fmt.Sprintf("%v", block.Value))))
 }
 
-func DecodeBlockFromJson(jsonBlock string) Block {
+func DecodeBlockFromJson(jsonBlock string) (block Block, err error) {
 
 	data := Data{}
-	err := json2.Unmarshal([]byte(jsonBlock), &data)
+	err = json2.Unmarshal([]byte(jsonBlock), &data)
 	if err != nil {
-		panic(err)
+		return Block{}, errors.New("block cannot be decoded")
 	}
 
-	block := Block{}
+	block = Block{}
 	block.Header.Height = data.Height
 	block.Header.Time = data.TimeStamp
 	block.Header.Hash = data.Hash
@@ -67,10 +68,10 @@ func DecodeBlockFromJson(jsonBlock string) Block {
 		block.Value.Insert(key, value)
 	}
 
-	return block
+	return block, nil
 }
 
-func (block *Block) EncodeToJson() string {
+func (block *Block) EncodeToJson() (json string, err error) {
 
 	data := Data{}
 	data.Height = block.Header.Height
@@ -80,10 +81,11 @@ func (block *Block) EncodeToJson() string {
 	data.TimeStamp = block.Header.Time
 	data.Mpt = block.Value.KVPairs
 
-	json, err := json2.Marshal(&data)
+	rawJson, err := json2.Marshal(&data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return string(json)
+	json = string(rawJson)
+	return json, nil
 }

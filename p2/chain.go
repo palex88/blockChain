@@ -3,6 +3,7 @@ package p2
 import (
 	json2 "encoding/json"
 	"errors"
+	"strings"
 )
 
 type BlockChain struct {
@@ -44,17 +45,33 @@ func (bc *BlockChain) Insert(block Block) {
 
 func (bc *BlockChain) EncodeToJson() (json string, err error) {
 
-	return "", nil
+	var blocks []string
+
+	for _, val := range bc.Chain {
+		//fmt.Printf("i: %d\n", i)
+		//fmt.Printf("val: %v\n", val)
+		for _, block := range val {
+			jsonBlock, err := block.EncodeToJson()
+			if err != nil {
+				return "", errors.New("chain cannot be encoded to json")
+			}
+			blocks = append(blocks, jsonBlock)
+		}
+	}
+	blocksString := "["
+	blocksString += strings.Join(blocks, ",")
+	blocksString += "]"
+	return blocksString, nil
 }
 
-func DecodeChainFromJson(jsonChain string) BlockChain {
+func DecodeChainFromJson(jsonChain string) (bc BlockChain, err error) {
 
-	bc := BlockChain{}
+	bc = BlockChain{}
 
 	value := make([]Data, 0)
-	err := json2.Unmarshal([]byte(jsonChain), &value)
+	err = json2.Unmarshal([]byte(jsonChain), &value)
 	if err != nil {
-		panic(err)
+		return bc, err
 	}
 
 	for _, data := range value {
@@ -71,5 +88,5 @@ func DecodeChainFromJson(jsonChain string) BlockChain {
 		bc.Insert(block)
 	}
 
-	return bc
+	return bc, nil
 }
