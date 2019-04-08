@@ -11,6 +11,10 @@ type BlockChain struct {
 	Length int32
 }
 
+func (bc *BlockChain) NewBlockChain() {
+	bc.Chain = make(map[int32][]Block)
+}
+
 func (bc *BlockChain) Get(height int32) (block []Block, err error) {
 
 	if height > bc.Length {
@@ -24,9 +28,9 @@ func (bc *BlockChain) Insert(block Block) {
 
 	height := block.Header.Height
 
-	if bc.Chain == nil {
-		bc.Chain = make(map[int32][]Block)
-	}
+	//if bc.Chain == nil {
+	//	bc.Chain = make(map[int32][]Block)
+	//}
 
 	blockArray := bc.Chain[height]
 	hash := block.Header.Hash
@@ -67,6 +71,7 @@ func (bc *BlockChain) EncodeToJson() (json string, err error) {
 func DecodeChainFromJson(jsonChain string) (bc BlockChain, err error) {
 
 	bc = BlockChain{}
+	bc.NewBlockChain()
 
 	value := make([]Data, 0)
 	err = json2.Unmarshal([]byte(jsonChain), &value)
